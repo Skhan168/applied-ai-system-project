@@ -89,13 +89,15 @@ def coach_feedback(guesses: list, secret: int) -> str:
     it reviews behavior (the guesses) and produces a judgment about
     how efficient the strategy was.
     """
-    if not guesses:
+    valid_guesses = [g for g in guesses if isinstance(g, int)]
+
+    if not valid_guesses:
         return "No guesses were made, so there's nothing to review yet."
 
-    if len(guesses) == 1:
+    if len(valid_guesses) == 1:
         return "You solved it in one guess! Lucky or a great instinct. 🍀"
 
-    distances = [abs(g - secret) for g in guesses]
+    distances = [abs(g - secret) for g in valid_guesses]
 
     improving_steps = 0
     for i in range(1, len(distances)):
