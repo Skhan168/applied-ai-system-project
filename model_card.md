@@ -1,0 +1,25 @@
+# Model Card: Game Glitch Investigator (Extended)
+
+## Limitations and Biases
+
+This system is a simple rule-based number guessing game with an added coach feedback feature — it is not a machine learning model, so "bias" here means logic bias rather than data bias. The coach's feedback is based on a simple rule (whether each guess got numerically closer to the secret), so it can't detect smarter strategies that don't look like steady narrowing (e.g., a valid binary-search-style guess that temporarily "overshoots"). The game also only works with a small numeric range and has no support for multiplayer or persistent history across sessions.
+
+## Potential Misuse
+
+This is a low-risk educational game, so misuse potential is minimal. The main risk is a player relying on the "Developer Debug Info" panel to see the secret number and cheat, which defeats the purpose of the game. In a real deployment, that debug panel would need to be removed or password-protected.
+
+## What Surprised Me During Testing
+
+[Write 1-2 sentences here based on your own experience. Example: "I was surprised that the coach feedback correctly distinguished between my two test runs — one where I bounced between low and high guesses got 'Decent strategy,' while steadily narrowing down got 'Great strategy.' This confirmed the logic was working as intended without needing to hardcode specific examples."]
+
+## AI Collaboration
+
+I used AI (Perplexity) throughout this project for debugging, design, and implementation help.
+
+**Helpful suggestion:** The AI helped me identify that my original bug was rooted in `app.py` converting the secret number to a string on even attempts, rather than in `check_guess()` itself. This let me fix the actual root cause instead of continuing to patch around it.
+
+**Flawed suggestion:** In my original Module 1 submission, the AI-influenced fix I made added a `try/except TypeError` fallback inside `check_guess()` to handle the string/int mismatch instead of removing the mismatch entirely. This was flawed because it hid the bug instead of fixing it, which is exactly what my grader feedback called out. In this project, I corrected that by removing the type conversion at its source in `app.py`, so `check_guess()` never has to guess at types again.
+
+## Testing Summary
+
+I wrote automated tests in `tests/test_logic.py` covering all logical branches: `check_guess` (win, too high, too low), `parse_guess` (valid input, empty input, invalid input, negative numbers), `update_score` (normal deduction, score floor at 0, win case), `get_temperature_emoji` (exact match, close, medium, far), and `coach_feedback` (empty history, single guess, steady improvement, mixed guesses, scattered guesses). All tests passed on the current implementation. I also manually played the game twice and confirmed the coach feedback matched the actual guess pattern in both cases.

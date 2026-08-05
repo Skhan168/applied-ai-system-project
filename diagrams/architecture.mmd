@@ -1,0 +1,14 @@
+flowchart TD
+    A[Player selects difficulty] --> B[Secret number generated\nrandom.randint low, high]
+    B --> C[Player enters a guess]
+    C --> D[parse_guess\nvalidates input]
+    D -->|invalid| E[Show error message]
+    D -->|valid| F[check_guess\ncompares guess to secret]
+    F --> G[get_temperature_emoji\nadds hot/cold hint]
+    F --> H[update_score\nadjusts score]
+    G --> I[Hint shown to player]
+    H --> I
+    F -->|Win or out of attempts| J[Game ends]
+    J --> K[coach_feedback\nreviews full guess history]
+    K --> L[Strategy feedback shown to player]
+    I --> C

@@ -1,12 +1,19 @@
 import random
 import streamlit as st
-from logic_utils import get_range_for_difficulty, parse_guess, check_guess, update_score
+from logic_utils import (
+    get_range_for_difficulty,
+    parse_guess,
+    check_guess,
+    update_score,
+    get_temperature_emoji,
+    coach_feedback,
+)
 
 
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
 st.title("🎮 Game Glitch Investigator")
-st.caption("An AI-generated guessing game. Something is off.")
+st.caption("An AI-generated guessing game, now debugged and improved.")
 
 st.sidebar.header("Settings")
 
@@ -32,7 +39,7 @@ if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
 
 if "score" not in st.session_state:
     st.session_state.score = 100
@@ -46,7 +53,7 @@ if "history" not in st.session_state:
 st.subheader("Make a guess")
 
 st.info(
-    f"Guess a number between 1 and 100. "
+    f"Guess a number between {low} and {high}. "
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
@@ -82,8 +89,10 @@ if new_game:
 if st.session_state.status != "playing":
     if st.session_state.status == "won":
         st.success("You already won. Start a new game to play again.")
+        st.info(coach_feedback(st.session_state.history, st.session_state.secret))
     else:
         st.error("Game over. Start a new game to try again.")
+        st.info(coach_feedback(st.session_state.history, st.session_state.secret))
     st.stop()
 
 if submit:
@@ -97,15 +106,13 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
+        secret = st.session_state.secret
 
         outcome, message = check_guess(guess_int, secret)
 
         if show_hint:
-            st.warning(message)
+            emoji = get_temperature_emoji(guess_int, secret)
+            st.warning(f"{emoji} {message}")
 
         st.session_state.score = update_score(
             current_score=st.session_state.score,
@@ -120,6 +127,7 @@ if submit:
                 f"You won! The secret was {st.session_state.secret}. "
                 f"Final score: {st.session_state.score}"
             )
+            st.info(coach_feedback(st.session_state.history, st.session_state.secret))
         else:
             if st.session_state.attempts >= attempt_limit:
                 st.session_state.status = "lost"
@@ -128,6 +136,7 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+                st.info(coach_feedback(st.session_state.history, st.session_state.secret))
 
 st.divider()
-st.caption("Built by an AI that claims this code is production-ready.")
+st.caption("Built by a human debugging AI-generated code, with fixes verified by tests.")
